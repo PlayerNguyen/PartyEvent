@@ -1,0 +1,16 @@
+
+
+id:
+  name: NAME_OF_EVENT
+  timeline:
+    - '18:00'
+  prepare: 15
+  durtion: 15
+  handle_block:
+    join:
+      message:
+        - '&c Có một gã khổng lồ đang đứng đây'
+      command:
+        - '[player] warp abc'
+        - '[console] kill %player_name%'
+      broadcasting:
