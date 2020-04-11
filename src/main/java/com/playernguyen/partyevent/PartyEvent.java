@@ -4,7 +4,6 @@ import com.playernguyen.partyevent.config.PluginConfiguration;
 import com.playernguyen.partyevent.object.EventManager;
 import com.playernguyen.partyevent.runnable.PartyEventUpdateTime;
 import com.playernguyen.partyevent.time.Realtime;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PartyEvent extends JavaPlugin {
@@ -36,7 +35,19 @@ public class PartyEvent extends JavaPlugin {
         setupInstance();
         setupManager();
         setupConfig();
+        validConfig();
         setupRealtime();
+    }
+
+    /**
+     * Valid the config is alright
+     */
+    private void validConfig() {
+        for (String id : getPluginConfiguration().getConfiguredEventID()) {
+            if (!getPluginConfiguration().isValid(id)) {
+                throw new IllegalStateException( String.format("Config not valid, empty data as id %s", id) );
+            }
+        }
     }
 
     /**
@@ -45,7 +56,8 @@ public class PartyEvent extends JavaPlugin {
     private void setupRealtime() {
         this.realtime = new Realtime(System.currentTimeMillis());
         // Run async task every tick
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, new PartyEventUpdateTime(), 1L, 1L);
+        PartyEventUpdateTime tick = new PartyEventUpdateTime();
+        tick.runTaskTimer(this, 1, 1);
     }
 
     /**

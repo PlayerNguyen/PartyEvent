@@ -1,7 +1,11 @@
 package com.playernguyen.partyevent.object;
 
 import com.playernguyen.partyevent.PartyEventInstance;
+import com.playernguyen.partyevent.event.EventChangedStateEvent;
+import com.playernguyen.partyevent.timeline.ITimeline;
 import org.bukkit.configuration.MemorySection;
+
+import java.util.ArrayList;
 
 public class Event extends PartyEventInstance implements IEvent {
 
@@ -13,6 +17,8 @@ public class Event extends PartyEventInstance implements IEvent {
 
     private EventState state;
 
+    private ArrayList<ITimeline> timelineList;
+
     public Event(String id, String name, int prepare, int duration, MemorySection handleBlock) {
         this.id = id;
         this.name = name;
@@ -21,6 +27,8 @@ public class Event extends PartyEventInstance implements IEvent {
         this.handleBlock = handleBlock;
         // Set state to not occur
         this.setState(EventState.NOT_OCCUR);
+        // Apply new timeline list
+        this.timelineList = new ArrayList<ITimeline>();
     }
 
     public String getId() {
@@ -48,7 +56,18 @@ public class Event extends PartyEventInstance implements IEvent {
     }
 
     public void setState(EventState state) {
-        this.state = state;
+        EventChangedStateEvent changedStateEvent = new EventChangedStateEvent(this);
+        if (changedStateEvent.callEvent()) {
+            this.state = state;
+        } else {
+            throw new IllegalStateException("Cannot change state because of false returned");
+        }
     }
+
+    public ArrayList<ITimeline> getTimelineList() {
+        return timelineList;
+    }
+
+
 }
 
